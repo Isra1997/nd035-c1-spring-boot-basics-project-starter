@@ -19,7 +19,7 @@ public class FileService {
     }
 
     public void uploadedFile(File file){
-        fileMapper.createFile(file);
+//        fileMapper.createFile(file);
     }
 
     public File downloadFile(String filename){
