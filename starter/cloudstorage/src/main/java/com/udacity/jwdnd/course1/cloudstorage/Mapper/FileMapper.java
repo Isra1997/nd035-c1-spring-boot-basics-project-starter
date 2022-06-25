@@ -11,16 +11,21 @@ public interface FileMapper {
     @Select("Select * from FILES")
     ArrayList<File> getAllFiles();
 
-    @Select("Select * from FILES where filename=#{filename}")
-    File getFileByFilename(String filename);
+    @Select("Select * from FILES where fileId=#{fileId}")
+    File getFileById(Integer fileId);
+
+    @Select("Select * from FILES where filename=#{filename} and userId=#{userId}")
+    File getFileByFilename(String filename,Integer userId);
 
     @Select("Select * from FILES where fileId=#{fileId}")
     File getFile(Integer fileId);
 
-//    @Insert("Insert into FILES(filename, contentType, fileSize ,UserId,fileData ) Values (#{filename},#{contentType},#{fileSize},#{UserId},#{fileData})")
-//    @Options(useGeneratedKeys = true, keyProperty = "fileId")
-//    int createFile(File file);
+    @Insert("Insert into FILES(filename, contentType, fileSize ,userId,fileData ) Values (#{filename},#{contentType},#{fileSize},#{userId},#{fileData})")
+    @Options(useGeneratedKeys = true, keyProperty = "fileId")
+    int createFile(File file);
 
     @Delete("Delete from FILES where fileId=#{fileId}")
     void deleteFile(Integer fileId);
+
+
 }
