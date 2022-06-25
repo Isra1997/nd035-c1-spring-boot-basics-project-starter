@@ -17,39 +17,58 @@ public class CredentialService {
 
     CredentialMapper credentialMapper;
     UserMapper userMapper;
-    HashService hashService;
+    EncryptionService encryptionService;
 
 
-    public CredentialService(CredentialMapper credentialMapper,UserMapper userMapper,HashService hashService) {
+    public CredentialService(CredentialMapper credentialMapper,UserMapper userMapper,EncryptionService encryptionService) {
         this.credentialMapper = credentialMapper;
         this.userMapper = userMapper;
-        this.hashService = hashService;
+        this.encryptionService = encryptionService;
     }
 
     public List<Credential> getAllCredentials(){
         return credentialMapper.getAllCredentials();
     }
 
+    public boolean isCredentialAvailable(int credentialId){
+        return credentialMapper.getCredentialById(credentialId) == null;
+    }
+
     public int createCredential(Credential credential){
         if(credentialMapper.getCredentialWithUsername(credential.getUsername())!=null){
-            return 0;
+            return -1;
         }else{
             //get the current user
             User user = userMapper.getUser(getUsername());
-            //hash the entered password
+            //encrypt the entered password
             SecureRandom secureRandom = new SecureRandom();
             byte [] salt = new byte[16];
             secureRandom.nextBytes(salt);
             String encodedSalt = Base64.getEncoder().encodeToString(salt);
-            String hashedPassword = hashService.getHashedValue(credential.getPassword(), encodedSalt);
+            String encryptedPassword = encryptionService.encryptValue(credential.getPassword(), encodedSalt);
             //create the credential
-            Credential newCredential = new Credential(null,credential.getUrl(), credential.getUsername(),encodedSalt ,hashedPassword,user.getUserId());
+            Credential newCredential = new Credential(null,credential.getUrl(), credential.getUsername(),encodedSalt ,encryptedPassword,user.getUserId());
             return credentialMapper.createCredential(newCredential);
         }
     }
 
     public void deleteCredential(Integer credentialId){
         credentialMapper.deleteCredential(credentialId);
+    }
+
+
+    public void updateCredential(Credential credential){
+        //get the current user
+        User user = userMapper.getUser(getUsername());
+        //encrypt the entered password
+        SecureRandom secureRandom = new SecureRandom();
+        byte [] salt = new byte[16];
+        secureRandom.nextBytes(salt);
+        String encodedSalt = Base64.getEncoder().encodeToString(salt);
+        String encryptedPassword = encryptionService.encryptValue(credential.getPassword(), encodedSalt);
+        //create the credential
+        Credential newCredential = new Credential(credential.getCredentialId(),credential.getUrl(), credential.getUsername(),encodedSalt ,encryptedPassword,user.getUserId());
+        credentialMapper.updateCredential(newCredential);
     }
 
     //get the current user's username
