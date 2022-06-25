@@ -39,6 +39,12 @@ public class NoteService {
         noteMapper.updateNote(note);
     }
 
+    public boolean isNotePresent(Integer noteId){
+        return noteMapper.getNoteWithId(noteId) == null;
+    }
+
+
+
     //get the current user's username
     public String getUsername(){
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
