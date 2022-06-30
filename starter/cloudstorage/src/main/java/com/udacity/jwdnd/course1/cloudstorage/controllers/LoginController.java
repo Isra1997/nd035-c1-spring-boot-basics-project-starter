@@ -12,7 +12,7 @@ import java.util.Map;
 @Controller
 public class LoginController {
 
-    @GetMapping("/login")
+    @GetMapping(value = {"/login","/"})
     public String getLoginView(@ModelAttribute("Success") Object success, Model model){
         model.addAttribute("Success", success);
         return "login";
