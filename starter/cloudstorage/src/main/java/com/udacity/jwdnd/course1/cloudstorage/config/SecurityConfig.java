@@ -14,6 +14,7 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter {
     private AuthenticationService authenticationService;
 
     public SecurityConfig(AuthenticationService authenticationService) {
+
         this.authenticationService = authenticationService;
     }
 
@@ -28,17 +29,20 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter {
                 .antMatchers("/","/login-error","/logout","/signup", "/css/**", "/js/**").permitAll()
                 .anyRequest().authenticated();
 
+        http.csrf().disable();
+
         http.formLogin()
                 .loginPage("/login")
                 .failureUrl("/login-error")
+                .defaultSuccessUrl("/home", true)
                 .permitAll();
+
 
         http
                 .logout()
                 .logoutSuccessUrl("/logout");
 
-        http.formLogin()
-                .defaultSuccessUrl("/home", true);
+
 
     }
 

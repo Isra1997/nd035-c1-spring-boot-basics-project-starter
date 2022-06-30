@@ -42,6 +42,8 @@ public class FileService {
         //check if a file with the same name exists
         if(fileMapper.getFileByFilename(multipartFile.getOriginalFilename(),user.getUserId())!=null){
             return -1;
+        }else if(multipartFile.getSize() > 1048576){
+            return -2;
         }else{
             //create the file
             Integer userId = user.getUserId();
@@ -52,6 +54,8 @@ public class FileService {
             File file = new File(null,filename,contentType,fileSize,userId,fileData);
             return fileMapper.createFile(file);
         }
+
+
     }
 
     public File downloadFile(String filename){

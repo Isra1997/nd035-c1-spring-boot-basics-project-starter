@@ -15,9 +15,12 @@
                 <div th:if="${isError == true}" class="alert alert-danger" >
                     Invalid username or password
                 </div>
-                <div th:if="${isLoggedOut == true}" class="alert alert-dark">
+                <div th:if="${isLoggedOut == true}" id="logoutMessage" class="alert alert-dark">
                     You have been logged out
                 </div>
+                <div th:if="${Success ==true}" id="success-msg" class="alert alert-dark">
+                You successfully signed up!
+                 </div>
                 <div class="form-group">
                     <label for="inputUsername">Username</label>
                     <input type="input" class="form-control" name="username" id="inputUsername" placeholder="Enter Username" maxlength="20" required>

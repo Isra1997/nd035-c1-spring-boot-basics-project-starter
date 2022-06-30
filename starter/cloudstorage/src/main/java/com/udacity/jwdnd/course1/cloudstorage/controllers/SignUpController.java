@@ -8,6 +8,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/signup")
@@ -25,7 +31,7 @@ public class SignUpController {
     }
 
     @PostMapping
-    public String signUp(@ModelAttribute("UserFormData") User user,Model model){
+    public String signUp(@ModelAttribute("UserFormData") User user, Model model, RedirectAttributes redirectAttributes) throws InterruptedException, IOException {
         String errorMessage = "";
         if(!userService.isUserAvailable(user.getUsername())){
             errorMessage = " This username is already taken please try another username";
@@ -35,12 +41,16 @@ public class SignUpController {
                 errorMessage = "Opps..Something went wrong please try again!";
             }
         }
+        ModelAndView modelAndView = null;
 
         if(!errorMessage.isEmpty()){
             model.addAttribute("errorMessage",errorMessage);
+            return "signup";
         }else{
-            model.addAttribute("Success", true);
+            redirectAttributes.addFlashAttribute("Success",true);
+            return "redirect:/login";
         }
-        return "signup";
+
+
     }
 }

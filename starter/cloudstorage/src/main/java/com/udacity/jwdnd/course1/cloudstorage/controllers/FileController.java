@@ -22,13 +22,20 @@ public class FileController {
 
     @PostMapping
     public String createOrUpdateFile(@ModelAttribute("file") FileForm fileForm, Model model) throws IOException {
+        System.out.println(fileForm.getFile().getSize());
         int created = fileService.uploadedFile(fileForm);
         if(created > 0){
+            System.out.println("File create");
             model.addAttribute("display", true);
         }else if(created == -1){
             model.addAttribute("message", "Please upload a file with a different name, as the uploaded file already exists");
             model.addAttribute("display", false);
-        }else{
+        }else if(created == -2) {
+            model.addAttribute("message", "The file size exceeds the size of 1048576 bytes.");
+            model.addAttribute("display", false);
+
+        }
+        else{
             model.addAttribute("message", "Opps...something went wrong please try again later!");
             model.addAttribute("display", false);
         }
