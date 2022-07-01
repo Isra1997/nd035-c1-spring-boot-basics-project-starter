@@ -2,7 +2,6 @@ package com.udacity.jwdnd.course1.cloudstorage;
 
 import PageObject.HomePage;
 import PageObject.LoginPage;
-import PageObject.ResultPage;
 import PageObject.SignupPage;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.*;
@@ -14,8 +13,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -49,7 +46,7 @@ public class NotesTest {
         this.wait = new WebDriverWait(driver,10);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("add-note-button")));
 
-        //click the add not button
+        //click the add note button
         driver.findElement(By.id("add-note-button")).click();
 
         //create the home page
@@ -73,7 +70,7 @@ public class NotesTest {
 
     @Test
     public void testEditNote() throws InterruptedException {
-        //delete note
+        //edit note
         homePage.editNote("title edit",driver,wait);
 
         //go to the home page
@@ -83,12 +80,12 @@ public class NotesTest {
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("add-note-button")));
 
         //assert that the note has been edited
-        assertTrue(homePage.isNoteDisplayed("title edit",driver));
+        assertTrue(homePage.isDisplayed("title edit",driver));
     }
 
     @Test
     public void  testCreateNote() {
-        //click the add not button
+        //click the add note button
         driver.findElement(By.id("add-note-button")).click();
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteModal")));
@@ -101,7 +98,7 @@ public class NotesTest {
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("add-note-button")));
 
         //assert that the note has been added
-        assertTrue(homePage.isNoteDisplayed("Test note title.",driver));
+        assertTrue(homePage.isDisplayed("Test note title.",driver));
     }
 
     @Test

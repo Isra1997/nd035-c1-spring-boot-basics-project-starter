@@ -38,7 +38,6 @@ public class loginPageTest {
         }
     }
 
-
     @Test
     public void unAuthorizedUserIsRedirectedToLogin(){
         driver.get("http://localhost:"+port+"/home");
