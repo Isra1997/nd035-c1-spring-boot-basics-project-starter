@@ -5,10 +5,7 @@ import PageObject.LoginPage;
 import PageObject.ResultPage;
 import PageObject.SignupPage;
 import io.github.bonigarcia.wdm.WebDriverManager;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -18,55 +15,128 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class NotesTest {
 
     private static WebDriver driver;
+    private HomePage homePage;
+    private WebDriverWait wait;
     @LocalServerPort
-    static int port;
+    int port;
 
 
     @BeforeAll
     public static void setup(){
         WebDriverManager.chromedriver().setup();
-        driver = new ChromeDriver();
-        driver.get("http://localhost:"+port+"/signup");
-        SignupPage signupPage = new SignupPage(driver);
-        signupPage.signup("hopeSwag","hope","swag","awesome");
     }
 
     @BeforeEach
     public void beforeEach(){
         driver = new ChromeDriver();
         driver.get("http://localhost:"+port+"/login");
-        LoginPage loginPage = new LoginPage(driver);
-        loginPage.login("hopeSwag","awesome");
+        signUp("testCreateNoteUsername","testCreateNoteFirstname","testCreateNoteLastname","testCreateNotePassword");
+        login("testCreateNoteUsername","testCreateNotePassword");
+
+        //go to the notes tab
+        WebElement notesTab = driver.findElement(By.id("nav-notes-tab"));
+        notesTab.click();
+
+        //wait until the note's page is loaded
+        this.wait = new WebDriverWait(driver,10);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("add-note-button")));
+
+        //click the add not button
+        driver.findElement(By.id("add-note-button")).click();
+
+        //create the home page
+        this.homePage = new HomePage(driver);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteModal")));
+        homePage.createNote("Test note title","Test note description");
+
+        //go to the home page
+        homePage.goToTheHomePage();
+
+        //wait until the homePage is loaded
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("add-note-button")));
+    }
+
+    @AfterEach
+    public void afterEach() {
+        if (this.driver != null) {
+            driver.quit();
+        }
     }
 
     @Test
-    public void  createNote() throws InterruptedException {
-        HomePage homePage = new HomePage(driver);
-        homePage.createNote("hi there!","lovely to see you",driver);
-        ResultPage resultPage = new ResultPage(driver);
-        resultPage.goHome();
-        assertTrue(homePage.isNoteDisplayed("hi there!",driver));
-        homePage.logout();
+    public void testEditNote() throws InterruptedException {
+        //delete note
+        homePage.editNote("title edit",driver,wait);
+
+        //go to the home page
+        homePage.goToTheHomePage();
+
+        //wait until the homePage is loaded
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("add-note-button")));
+
+        //assert that the note has been edited
+        assertTrue(homePage.isNoteDisplayed("title edit",driver));
     }
 
     @Test
-    public void deleteNote() throws InterruptedException {
-        HomePage homePage = new HomePage(driver);
-        homePage.createNote("Delete test!","This note is meant to be deleted.",driver);
-        homePage.deleteNote("Delete test!",driver);
-        assertFalse(homePage.isNoteDisplayed("Delete test!",driver));
+    public void  testCreateNote() {
+        //click the add not button
+        driver.findElement(By.id("add-note-button")).click();
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteModal")));
+        homePage.createNote("Test note title.","Test note description.");
+
+        //go to the home page
+        homePage.goToTheHomePage();
+
+        //wait until the homePage is loaded
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("add-note-button")));
+
+        //assert that the note has been added
+        assertTrue(homePage.isNoteDisplayed("Test note title.",driver));
+    }
+
+    @Test
+    public void testDeleteNote(){
+        //get the current row count
+        int currentCount = homePage.getThCount(driver);
+        //delete note
+        homePage.deleteNote("Test note title",driver);
+
+        //go to the home page
+        homePage.goToTheHomePage();
+
+        //wait until the homePage is loaded
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("add-note-button")));
+
+        //assert that the note has been deleted
+        assertEquals(currentCount-1,homePage.getThCount(driver));
     }
 
 
     @AfterAll
     public static void tearDown(){
         driver.quit();
+    }
+
+
+    private void signUp(String username,String firstname,String lastname,String password){
+        driver.get("http://localhost:"+port+"/signup");
+        SignupPage signupPage = new SignupPage(driver);
+        signupPage.signup(username, firstname, lastname, password);
+    }
+
+    private void login(String username, String password){
+        driver.get("http://localhost:"+port+"/login");
+        LoginPage loginPage = new LoginPage(driver);
+        loginPage.login(username, password);
     }
 }

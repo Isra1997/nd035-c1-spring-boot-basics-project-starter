@@ -45,59 +45,77 @@ public class HomePage {
     private WebElement credentialsTab;
 
 
+    @FindBy(id = "home-link-success")
+    private WebElement linkToHomePage;
+
+
 
     public HomePage(WebDriver driver) {
         PageFactory.initElements(driver,this);
     }
 
-    public void createNote(String noteTitle,String noteDescription,WebDriver driver) throws InterruptedException {
-        notesTab.click();
-        Thread.sleep(2000);
-        List<WebElement> inputs = driver.findElements(By.tagName("button"));
-        for (WebElement input : inputs) {
-            System.out.println(input.getAttribute("value"));
-            if (input.getAttribute("value").equals("+ Add a New Note")) {
-                addNoteButton = input;
-            }
-        }
-        addNoteButton.click();
-        Thread.sleep(2000);
+    public void createNote(String noteTitle,String noteDescription){
+        this.noteTitle.click();
         this.noteTitle.sendKeys(noteTitle);
+        this.noteDescription.click();
         this.noteDescription.sendKeys(noteDescription);
-        this.noteForm.submit();
-        Thread.sleep(2000);
+        noteForm.submit();
+    }
+
+    public int getThCount(WebDriver driver){
+        List<WebElement> inputs = driver.findElements(By.tagName("th"));
+        return inputs.size();
     }
 
 
-    public boolean isNoteDisplayed(String noteTitle,WebDriver driver) throws InterruptedException {
-        Thread.sleep(2000);
+    public boolean isNoteDisplayed(String noteTitle,WebDriver driver){
         List<WebElement> inputs = driver.findElements(By.tagName("th"));
         for (WebElement input : inputs) {
-            System.out.println(input.getText());
             if (input.getText().equals(noteTitle)) {
                 return true;
             }
         }
-        Thread.sleep(2000);
         return false;
     }
 
 
     public void deleteNote(String noteTitle,WebDriver driver){
-        WebElement trTag = driver.findElement(By.id("note-tbody"));
-        List<WebElement> childElements = trTag.findElements(By.xpath("./child::*"));
-        WebElement deleteBtn = null;
-        WebElement noteTitleElement = null;
-        for (WebElement element: childElements) {
-            if(element.getText().equals("Delete")){
-                deleteBtn = element;
-            }
-            if(element.getText().equals(noteTitle) && deleteBtn !=null){
-                deleteBtn.click();
+        List<WebElement> inputs = driver.findElements(By.tagName("th"));
+        List<WebElement> deleteButtons = driver.findElements(By.tagName("a"));
+
+        for (WebElement input : inputs) {
+            System.out.println(input.getText());
+            if (input.getText().equals(noteTitle)) {
+                System.out.println("Im in here");
+                deleteButtons.get(deleteButtons.size()-1).click();
+                break;
             }
         }
 
     }
+
+    public void editNote(String noteTitleEdited,WebDriver driver,WebDriverWait wait){
+        List<WebElement> editButtons = driver.findElements(By.tagName("button"));
+
+        //get the edit button
+        for (int i = 0; i < editButtons.size(); i++) {
+            if(editButtons.get(i).getText().equals("Edit")){
+                editButtons.get(i).click();
+                wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteModal")));
+                driver.findElement(By.id("note-title")).clear();
+                driver.findElement(By.id("note-title")).sendKeys(noteTitleEdited);
+                driver.findElement(By.id("save-note-changes")).click();
+                break;
+            }
+        }
+    }
+
+
+
+    public void goToTheHomePage(){
+        linkToHomePage.click();
+    }
+
 
     public void logout(){
         logoutButton.click();

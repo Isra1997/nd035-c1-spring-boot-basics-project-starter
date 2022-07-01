@@ -31,6 +31,14 @@ public class loginPageTest {
         driver = new ChromeDriver();
     }
 
+    @AfterEach
+    public void afterEach() {
+        if (this.driver != null) {
+            driver.quit();
+        }
+    }
+
+
     @Test
     public void unAuthorizedUserIsRedirectedToLogin(){
         driver.get("http://localhost:"+port+"/home");
@@ -53,7 +61,7 @@ public class loginPageTest {
     }
 
     @Test
-    public void verifyUserSignUpAndLogin() throws InterruptedException {
+    public void verifyUserSignUpAndLogin()  {
         driver.get("http://localhost:"+port+"/signup");
         SignupPage signupPage = new SignupPage(driver);
         signupPage.signup("hopeSwag","hope","swag","awesome");
